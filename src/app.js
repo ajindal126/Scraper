@@ -17,7 +17,13 @@ app.get('/scrape',function(req,res){
 	var pagesVisited={};
 	var pagesToVisit=[];
 	pagesToVisit.push(url);
-	scraping();
+	scraping(function(){
+			fs.writeFile('Links.json',JSON.stringify(pagesVisited,null,4),function(err){
+			if(!err){
+				res.send("File written successfully!!!!")
+			}
+		})
+	});
 	function scraping(){
 
 		var newPage=pagesToVisit.pop();
@@ -46,6 +52,7 @@ app.get('/scrape',function(req,res){
 		request(page,function(error,response,html){
 			
 			console.log(page);
+
 		if(!error && response.statusCode==200){
 			
 			var $=cheerio.load(html);
@@ -55,7 +62,7 @@ app.get('/scrape',function(req,res){
 			$(links).each(function(i,link){
 				//json.content=$(link).text();
 				var a=$(link).attr('href');
-				if(a.indexOf("medium")!==-1){
+				if(a && a.indexOf("medium")!==-1){
 				pagesToVisit.push(a);					
 				}
 				
@@ -69,13 +76,6 @@ app.get('/scrape',function(req,res){
 		});
 	}
 
-
-
-
-
-
-
-
 		// fs.writeFile('Links.json',JSON.stringify(pagesVisited,null,4),function(err){
 		// 	if(!err){
 		// 		res.send("File written successfully!!!!")
@@ -88,7 +88,7 @@ app.get('/scrape',function(req,res){
 });
 
 
-app.listen(8006,function(){
+app.listen(8015,function(){
 
-	console.log("App is running on port 8006");
+	console.log("App is running on port 8015");
 });
